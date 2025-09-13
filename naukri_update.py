@@ -1,73 +1,68 @@
+# naukri_update.py
+import os
+import tempfile
 from selenium import webdriver
 from selenium.webdriver.common.by import By
-from selenium.webdriver.common.keys import Keys
-import time
-from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.support.wait import WebDriverWait
-
-# Your credentials
-from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
-import tempfile
-import os
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 
+# -------------------------------
+# Read credentials from environment variables
+# Make sure NAUKRI_USERNAME and NAUKRI_PASSWORD are set as GitHub Secrets
+USERNAME = os.getenv("NAUKRI_USERNAME")
+PASSWORD = os.getenv("NAUKRI_PASSWORD")
+
+# Path to resume inside repo
+RESUME_PATH = os.path.join(os.getcwd(), "Resume.pdf")
+
+# -------------------------------
+# Chrome setup for headless server environment
 options = Options()
-options.add_argument("--headless=new")          # headless mode for server
+options.add_argument("--headless=new")          # Headless mode
 options.add_argument("--no-sandbox")
 options.add_argument("--disable-dev-shm-usage")
 
-# Use a temporary directory for Chrome user data
+# Temporary user data dir to avoid session conflicts
 temp_dir = tempfile.mkdtemp()
 options.add_argument(f"--user-data-dir={temp_dir}")
 
 driver = webdriver.Chrome(options=options)
-
-RESUME_PATH = r"C:\Users\admin\Downloads\Resume.pdf"   # Update path to your resume
-
-# Launch browser
-driver.maximize_window()
-driver.get("https://www.naukri.com/nlogin/login")
-
-# Login
-time.sleep(3)
-driver.set_page_load_timeout(20)
+driver.set_page_load_timeout(60)
 wait = WebDriverWait(driver, 60)
-username_input = wait.until(EC.presence_of_element_located((By.ID, "usernameField")))
-username_input.send_keys(USERNAME)
 
-password_input = wait.until(EC.presence_of_element_located((By.ID, "passwordField")))
-password_input.send_keys(PASSWORD)
-driver.find_element(By.ID, "usernameField").send_keys(USERNAME)
-driver.find_element(By.ID, "passwordField").send_keys(PASSWORD)
-driver.find_element(By.XPATH, "//button[text()='Login']").click()
+try:
+    # -------------------------------
+    # Open Naukri login page
+    driver.get("https://www.naukri.com/nlogin/login")
 
-time.sleep(5)  # wait for login
+    # -------------------------------
+    # Wait for login fields and enter credentials
+    username_input = wait.until(EC.presence_of_element_located((By.ID, "usernameField")))
+    username_input.send_keys(USERNAME)
 
-# Go to profile page
-# driver.get("https://www.naukri.com/mnjuser/profile")
+    password_input = wait.until(EC.presence_of_element_located((By.ID, "passwordField")))
+    password_input.send_keys(PASSWORD)
 
-time.sleep(5)
+    login_button = wait.until(EC.element_to_be_clickable((By.XPATH, "//button[text()='Login']")))
+    login_button.click()
 
-wait.until(
-    EC.visibility_of_element_located((By.XPATH, "//*[@class='info__heading']"))
-)
+    # -------------------------------
+    # Wait for profile info to load
+    wait.until(EC.visibility_of_element_located((By.XPATH, "//*[@class='info__heading']")))
+    profile_name = driver.find_element(By.XPATH, "//*[@class='info__heading']").get_attribute("title")
+    print(f"Logged in as: {profile_name}")
 
+    # -------------------------------
+    # Go to profile page
+    driver.get("https://www.naukri.com/mnjuser/profile")
 
-ele=driver.find_element(By.XPATH,"//*[@class='info__heading']").get_attribute("title")
-print(ele)
-driver.get("https://www.naukri.com/mnjuser/profile")
-# Click upload resume
-file_input = wait.until(
-    EC.presence_of_element_located((By.XPATH, "//input[@id='attachCV']"))
-)
-file_input.send_keys(RESUME_PATH)
+    # Wait for resume upload input
+    file_input = wait.until(EC.presence_of_element_located((By.ID, "attachCV")))
+    file_input.send_keys(RESUME_PATH)
 
-# upload_button = driver.find_element(By.XPATH, "//input[@id='attachCV']")
-# upload_button.send_keys(RESUME_PATH)
+    print("✅ Resume updated successfully!")
 
-time.sleep(5)
-
-print("✅ Resume updated successfully!")
-driver.quit()
-
-
+finally:
+    driver.quit()
+    
