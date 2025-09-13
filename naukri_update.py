@@ -30,6 +30,13 @@ driver.get("https://www.naukri.com/nlogin/login")
 
 # Login
 time.sleep(3)
+driver.set_page_load_timeout(20)
+wait = WebDriverWait(driver, 60)
+username_input = wait.until(EC.presence_of_element_located((By.ID, "usernameField")))
+username_input.send_keys(USERNAME)
+
+password_input = wait.until(EC.presence_of_element_located((By.ID, "passwordField")))
+password_input.send_keys(PASSWORD)
 driver.find_element(By.ID, "usernameField").send_keys(USERNAME)
 driver.find_element(By.ID, "passwordField").send_keys(PASSWORD)
 driver.find_element(By.XPATH, "//button[text()='Login']").click()
@@ -40,8 +47,7 @@ time.sleep(5)  # wait for login
 # driver.get("https://www.naukri.com/mnjuser/profile")
 
 time.sleep(5)
-driver.set_page_load_timeout(20)
-wait = WebDriverWait(driver, 60)
+
 wait.until(
     EC.visibility_of_element_located((By.XPATH, "//*[@class='info__heading']"))
 )
@@ -63,4 +69,5 @@ time.sleep(5)
 
 print("✅ Resume updated successfully!")
 driver.quit()
+
 
