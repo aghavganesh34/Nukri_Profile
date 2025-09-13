@@ -6,12 +6,25 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.wait import WebDriverWait
 
 # Your credentials
-USERNAME = "ganeshaghav34@gmail.com"
-PASSWORD = "Ganu@1412"
+from selenium import webdriver
+from selenium.webdriver.chrome.options import Options
+import tempfile
+import os
+
+options = Options()
+options.add_argument("--headless=new")          # headless mode for server
+options.add_argument("--no-sandbox")
+options.add_argument("--disable-dev-shm-usage")
+
+# Use a temporary directory for Chrome user data
+temp_dir = tempfile.mkdtemp()
+options.add_argument(f"--user-data-dir={temp_dir}")
+
+driver = webdriver.Chrome(options=options)
+
 RESUME_PATH = r"C:\Users\admin\Downloads\Resume.pdf"   # Update path to your resume
 
 # Launch browser
-driver = webdriver.Chrome()
 driver.maximize_window()
 driver.get("https://www.naukri.com/nlogin/login")
 
@@ -50,3 +63,4 @@ time.sleep(5)
 
 print("✅ Resume updated successfully!")
 driver.quit()
+
