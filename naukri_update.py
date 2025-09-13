@@ -12,7 +12,8 @@ from selenium.webdriver.support import expected_conditions as EC
 # Make sure NAUKRI_USERNAME and NAUKRI_PASSWORD are set as GitHub Secrets
 USERNAME = os.getenv("NAUKRI_USERNAME")
 PASSWORD = os.getenv("NAUKRI_PASSWORD")
-
+print(USERNAME)
+print(PASSWORD)
 # Path to resume inside repo
 RESUME_PATH = os.path.join(os.getcwd(), "Resume.pdf")
 
@@ -66,3 +67,4 @@ try:
 finally:
     driver.quit()
     
+
