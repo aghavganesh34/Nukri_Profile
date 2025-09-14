@@ -14,7 +14,7 @@ jobs:
       NAUKRI_PASSWORD: ${{ secrets.NAUKRI_PASSWORD }}
       GITHUB_ACTIONS: true
     steps:
-      - name: Checkout repo
+      - name: Checkout repository
         uses: actions/checkout@v3
 
       - name: Set up Python
@@ -31,20 +31,8 @@ jobs:
         run: python naukri_update.py
 
       - name: Delete old workflow runs (keep latest 1)
-        uses: peter-evans/delete-workflow-runs@v2
+        uses: peter-evans/delete-workflow-runs@v2.2.0
         with:
           workflow: Naukri Resume Auto Update
           keep-succeeded: 1
           keep-failed: 1
-
-      - name: Send email notification
-        uses: dawidd6/action-send-mail@v3
-        with:
-          server_address: smtp.gmail.com
-          server_port: 465
-          username: ${{ secrets.EMAIL_USERNAME }}
-          password: ${{ secrets.EMAIL_PASSWORD }}
-          subject: "Naukri Resume Updated ✅"
-          body: "Your Naukri resume has been updated successfully."
-          to: "your_email@gmail.com"
-          secure: true
