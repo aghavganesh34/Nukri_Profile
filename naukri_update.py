@@ -1,4 +1,3 @@
-# naukri_update.py
 import os
 import tempfile
 from selenium import webdriver
@@ -9,11 +8,12 @@ from selenium.webdriver.support import expected_conditions as EC
 
 # -------------------------------
 # Read credentials from environment variables
-# Make sure NAUKRI_USERNAME and NAUKRI_PASSWORD are set as GitHub Secrets
 USERNAME = os.getenv("NAUKRI_USERNAME")
 PASSWORD = os.getenv("NAUKRI_PASSWORD")
-print(USERNAME)
-print(PASSWORD)
+
+if not USERNAME or not PASSWORD:
+    raise ValueError("❌ Username/Password not found. Did you set GitHub Secrets correctly?")
+
 # Path to resume inside repo
 RESUME_PATH = os.path.join(os.getcwd(), "Resume.pdf")
 
@@ -52,7 +52,7 @@ try:
     # Wait for profile info to load
     wait.until(EC.visibility_of_element_located((By.XPATH, "//*[@class='info__heading']")))
     profile_name = driver.find_element(By.XPATH, "//*[@class='info__heading']").get_attribute("title")
-    print(f"Logged in as: {profile_name}")
+    print(f"✅ Logged in as: {profile_name}")
 
     # -------------------------------
     # Go to profile page
@@ -66,5 +66,3 @@ try:
 
 finally:
     driver.quit()
-    
-
