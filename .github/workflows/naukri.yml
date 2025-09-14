@@ -2,15 +2,15 @@ name: Naukri Resume Auto Update
 
 on:
   schedule:
-    - cron: "0 */2 * * *"   # Runs every 2 hours
-  workflow_dispatch:         # Allow manual run
+    - cron: "0 */2 * * *"   # Every 2 hours UTC
+  workflow_dispatch:        # Allows manual run from GitHub UI
 
 jobs:
   update-resume:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
+      - name: Checkout repo
         uses: actions/checkout@v3
 
       - name: Set up Python
@@ -23,9 +23,9 @@ jobs:
           python -m pip install --upgrade pip
           pip install selenium
 
-      - name: Run script
+      - name: Run Naukri Resume Update
         env:
-          USERNAME: ${{ secrets.NAUKRI_USERNAME }}
-          PASSWORD: ${{ secrets.NAUKRI_PASSWORD }}
-          RESUME_PATH: ${{ secrets.RESUME_PATH }}
-        run: python naukri_update.py
+          NAUKRI_USERNAME: ${{ secrets.NAUKRI_USERNAME }}
+          NAUKRI_PASSWORD: ${{ secrets.NAUKRI_PASSWORD }}
+        run: |
+          python naukri_update.py
