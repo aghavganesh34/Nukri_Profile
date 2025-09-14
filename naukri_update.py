@@ -12,7 +12,8 @@ from selenium.webdriver.support import expected_conditions as EC
 # load_dotenv()
 USERNAME = os.getenv("NAUKRI_USERNAME")
 PASSWORD = os.getenv("NAUKRI_PASSWORD")
-
+print(USERNAME)
+print(PASSWORD)
 if not USERNAME or not PASSWORD:
     raise ValueError("❌ Username/Password not found. Did you set GitHub Secrets correctly?")
 
@@ -81,4 +82,5 @@ try:
 
 finally:
     driver.quit()
+
 
