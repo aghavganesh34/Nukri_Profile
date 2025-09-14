@@ -1,8 +1,6 @@
 import os
 import tempfile
 from time import sleep
-
-from dotenv import load_dotenv
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.options import Options
@@ -83,3 +81,4 @@ try:
 
 finally:
     driver.quit()
+
