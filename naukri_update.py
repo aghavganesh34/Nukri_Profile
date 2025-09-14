@@ -1,5 +1,8 @@
 import os
 import tempfile
+from time import sleep
+
+from dotenv import load_dotenv
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.options import Options
@@ -8,6 +11,7 @@ from selenium.webdriver.support import expected_conditions as EC
 
 # -------------------------------
 # Read credentials from environment variables
+# load_dotenv()
 USERNAME = os.getenv("NAUKRI_USERNAME")
 PASSWORD = os.getenv("NAUKRI_PASSWORD")
 
@@ -20,9 +24,13 @@ RESUME_PATH = os.path.join(os.getcwd(), "Resume.pdf")
 # -------------------------------
 # Chrome setup for headless server environment
 options = Options()
-options.add_argument("--headless=new")          # Headless mode
+options.add_argument("--headless")   # use old headless, more stable
 options.add_argument("--no-sandbox")
 options.add_argument("--disable-dev-shm-usage")
+options.add_argument("--window-size=1920,1080")
+options.add_argument("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+                     "AppleWebKit/537.36 (KHTML, like Gecko) "
+                     "Chrome/115.0.0.0 Safari/537.36")
 
 # Temporary user data dir to avoid session conflicts
 temp_dir = tempfile.mkdtemp()
@@ -31,12 +39,11 @@ options.add_argument(f"--user-data-dir={temp_dir}")
 driver = webdriver.Chrome(options=options)
 driver.set_page_load_timeout(60)
 wait = WebDriverWait(driver, 60)
-
 try:
     # -------------------------------
     # Open Naukri login page
     driver.get("https://www.naukri.com/nlogin/login")
-
+    sleep(5)
     # -------------------------------
     # Wait for login fields and enter credentials
     username_input = wait.until(EC.presence_of_element_located((By.ID, "usernameField")))
@@ -56,13 +63,23 @@ try:
 
     # -------------------------------
     # Go to profile page
+    # -------------------------------
+    # Go to profile page
     driver.get("https://www.naukri.com/mnjuser/profile")
 
     # Wait for resume upload input
     file_input = wait.until(EC.presence_of_element_located((By.ID, "attachCV")))
     file_input.send_keys(RESUME_PATH)
 
-    print("✅ Resume updated successfully!")
+    # Wait for success message or updated text
+    try:
+        success_msg = wait.until(
+            EC.presence_of_element_located(
+                (By.XPATH, "//*[contains(text(),'successfully uploaded') or contains(text(),'uploaded successfully')]"))
+        )
+        print("✅ Resume updated:", success_msg.text)
+    except:
+        print("⚠️ Resume upload attempted, but success message not found. Check UI manually.")
 
 finally:
     driver.quit()
